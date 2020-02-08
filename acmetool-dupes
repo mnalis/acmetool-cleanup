@@ -56,7 +56,7 @@ sub is_subset($$) {
 sub is_redundant($) {
 	my ($check_desired_file) = @_;
 	
-	say "checking: $check_desired_file";
+	#say "checking: $check_desired_file";
 	my $duplicates = 0;
 	foreach my $other_file (keys %DF) {
 		next if $check_desired_file eq $other_file; 	# skip checking self
@@ -78,7 +78,7 @@ foreach my $desired_file (@desired_files)
 	import_desired_file($desired_file);
 }
 
-say Dumper(\%DF);
+#say Dumper(\%DF);
 
 my $TO_REMOVE='';
 foreach my $check_desired_file (keys %DF) {
@@ -92,4 +92,5 @@ foreach my $check_desired_file (keys %DF) {
 if ($TO_REMOVE) {
 	say 'Recommended action:';
 	say "rm $TO_REMOVE";
+	say "sudo -u acme acmetool cull"
 }
