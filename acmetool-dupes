@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# Matija Nalis <mnalis-perl@axe.tomsoft.hr> started 2020/02
+# Matija Nalis <mnalis-perl@axe.tomsoft.hr> started 2020/02 GPLv3+
 # find duplicate rendundant ACME request files create by acmetool from https://hlandau.github.io/acmetool/
 #
 # Needs: apt-get install libarray-utils-perl
