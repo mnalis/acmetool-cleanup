@@ -90,7 +90,7 @@ foreach my $check_desired_file (keys %DF) {
 }
 
 if ($TO_REMOVE) {
-	say 'Recommended action:';
+	say 'Recommended actions:';
 	say "rm $TO_REMOVE";
 	say "sudo -u acme acmetool cull"
 }
