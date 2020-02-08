@@ -11,11 +11,16 @@ use feature 'say';
 use Data::Dumper;
 use Array::Utils qw 'array_minus';
 
-my $DESIRED_DIR='./desired';	# FIXME should be: /var/lib/acme/desired
-my %CN = ();
-my %DF = ();
+my $ACMETOOL_DIR = '.';		# FIXME should be: /var/lib/acme
 
-# imports one file from /var/lib/acme/desired/ to memor
+#
+# no user configurable parts below
+#
+
+my $DESIRED_DIR="$ACMETOOL_DIR/desired";
+my %DF = ();			# content of desired files (FQDNs per desired file)
+
+# imports one file from /var/lib/acme/desired/ to memory
 sub import_desired_file($) {
 	my ($fname) = @_;
 	#say "Processing desired file: $fname";
@@ -26,7 +31,6 @@ sub import_desired_file($) {
 			chomp;
 			my ($pre, $fqdn) = split;
 			if ($pre ne '-') { die "invalid prefix: $pre in line $_" }
-			#push @{$CN{$fqdn}}, $fname;
 			push @{$DF{$fname}}, $fqdn;
 			#say "\tImported $fqdn from $fname";
 		} else {
@@ -74,11 +78,18 @@ foreach my $desired_file (@desired_files)
 	import_desired_file($desired_file);
 }
 
-#say Dumper(\%CN);
 say Dumper(\%DF);
 
-
+my $TO_REMOVE='';
 foreach my $check_desired_file (keys %DF) {
 	my $duplicate = is_redundant($check_desired_file);
-	say "\tfound $duplicate supersets for redundant file $check_desired_file" if $duplicate;
+	if ($duplicate) {
+		say "Found $duplicate supersets for redundant file $check_desired_file";
+		$TO_REMOVE .= "$DESIRED_DIR/$check_desired_file ";
+	}
+}
+
+if ($TO_REMOVE) {
+	say 'Recommended action:';
+	say "rm $TO_REMOVE";
 }
