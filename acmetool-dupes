@@ -11,7 +11,7 @@ use feature 'say';
 use Data::Dumper;
 use Array::Utils qw 'array_minus';
 
-my $ACMETOOL_DIR = '.';		# FIXME should be: /var/lib/acme
+my $ACMETOOL_DIR = '/var/lib/acme';
 
 #
 # no user configurable parts below
@@ -90,7 +90,7 @@ foreach my $check_desired_file (keys %DF) {
 }
 
 if ($TO_REMOVE) {
-	say 'Recommended actions:';
-	say "rm $TO_REMOVE";
+	say "\nRecommended actions (backup first!):";
+	say "sudo -u acme rm $TO_REMOVE";
 	say "sudo -u acme acmetool cull"
 }

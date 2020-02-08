@@ -2,3 +2,10 @@
 - FIXME's in code
 - check live/* and warn if removed files might need config changing (also grep /etc, /usr/local/etc for /var/lib/acme/live/xxxxxxx" ?)
 - nagios-local-multi cron check add (if acmetool installed)
+- put in debian package
+
+- extra tools:
+	- check if all symlinks (and/or their destinations) in /var/lib/acme/live are newer than 3 months
+	- check if all FQDNs in names of /var/lib/acme/live resolve in DNS (to that machine IP?)
+	- check if all FQDNs contained in /var/lib/acme/desired/* resolve in DNS (to that machine IP?)
+	- parse certificates in /var/lib/acme/certs and see if there are any expired ones
