@@ -1,0 +1,4 @@
+- README.md
+- FIXME's in code
+- check live/* and warn if removed files might need config changing (also grep /etc, /usr/local/etc for /var/lib/acme/live/xxxxxxx" ?)
+- nagios-local-multi cron check add (if acmetool installed)
