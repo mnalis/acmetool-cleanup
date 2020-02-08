@@ -12,6 +12,7 @@
 	  config needs changing, but if it was only desired/FQDN1-*, that we should recommending grepping for 
 	  "acme/live/FQDN1" in /etc to fix configs to use superset-certificate instead of old one which will 
 	  not be updated any more
+	- recommend tar zcf /var/backups/acmetool-`date +%s`.tgz /var/lib/acme/
 	- parse certificates in /var/lib/acme/certs and see if there are any expired ones
 	- psql https://crt.sh/ checker for problems for any host in our specified domain example.com (as nagios plugin)
 	  (check if there are duplicate requested cert in less than 30 days for same hostnames, or coming from unknown IPs)
