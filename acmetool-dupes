@@ -1,0 +1,42 @@
+#!/usr/bin/perl
+
+use warnings;
+use autodie qw /:all/;
+use feature 'say';
+use Data::Dumper;
+
+my $DESIRED_DIR='./desired';
+my %CN = ();
+
+sub import_desired_file($) {
+	my ($fname) = @_;
+	say "Processing desired file: $fname";
+	open my $fd, '<', "${DESIRED_DIR}/${fname}";
+	my $started=0;
+	while (<$fd>) {
+		if ($started) {
+			chomp;
+			my ($pre, $fqdn) = split;
+			if ($pre ne '-') { die "invalid prefix: $pre in line $_" }
+			$CN{$fqdn} .= "${fname} ";
+			say "\tImported $fqdn from $fname";
+		} else {
+			if (/names:/) { $started = 1 }
+		}
+	}
+}
+
+#
+# MAIN
+#
+
+opendir(my $dh, $DESIRED_DIR);
+my @desired_files = grep { -f "$DESIRED_DIR/$_" } readdir($dh);
+closedir $dh;
+
+foreach my $desired_file (@desired_files)
+{
+	import_desired_file($desired_file);
+}
+
+say Dumper(\%CN);
