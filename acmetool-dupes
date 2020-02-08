@@ -1,16 +1,24 @@
 #!/usr/bin/perl
+# Matija Nalis <mnalis-perl@axe.tomsoft.hr> started 2020/02
+# find duplicate rendundant ACME request files create by acmetool from https://hlandau.github.io/acmetool/
+#
+# Needs: apt-get install libarray-utils-perl
+#
 
 use warnings;
-use autodie qw /:all/;
+use autodie qw ':all';
 use feature 'say';
 use Data::Dumper;
+use Array::Utils qw 'array_minus';
 
-my $DESIRED_DIR='./desired';
+my $DESIRED_DIR='./desired';	# FIXME should be: /var/lib/acme/desired
 my %CN = ();
+my %DF = ();
 
+# imports one file from /var/lib/acme/desired/ to memor
 sub import_desired_file($) {
 	my ($fname) = @_;
-	say "Processing desired file: $fname";
+	#say "Processing desired file: $fname";
 	open my $fd, '<', "${DESIRED_DIR}/${fname}";
 	my $started=0;
 	while (<$fd>) {
@@ -18,12 +26,39 @@ sub import_desired_file($) {
 			chomp;
 			my ($pre, $fqdn) = split;
 			if ($pre ne '-') { die "invalid prefix: $pre in line $_" }
-			$CN{$fqdn} .= "${fname} ";
-			say "\tImported $fqdn from $fname";
+			#push @{$CN{$fqdn}}, $fname;
+			push @{$DF{$fname}}, $fqdn;
+			#say "\tImported $fqdn from $fname";
 		} else {
 			if (/names:/) { $started = 1 }
 		}
 	}
+}
+
+# returns true if all elements of $needle_name are also contained in $haystack_name
+sub is_subset($$) {
+	my ($needle_name, $haystack_name) = @_;
+	#say "\t check if all elements of $needle_name are in $haystack_name";
+	my @needle = @{$DF{$needle_name}};
+	my @haystack = @{$DF{$haystack_name}};
+	#say "\t\t checking: " . join (',', @needle) . ' against ' . join(',', @haystack);
+	my @diff = array_minus ( @needle, @haystack );	# If an empty array is returned, NEEDLE is subset of HAYSTACK.
+	my $len_diff = scalar @diff;
+	#say "\t\t diff($len_diff):" . join (' ', @diff);
+	return  $len_diff == 0;
+}
+
+# retuns true if all elements of $check_desired_file are contained somewhere else, so $check_desired_file can be removed
+sub is_redundant($) {
+	my ($check_desired_file) = @_;
+	
+	say "checking: $check_desired_file";
+	my $duplicates = 0;
+	foreach my $other_file (keys %DF) {
+		next if $check_desired_file eq $other_file; 	# skip checking self
+		$duplicates++ if is_subset($check_desired_file, $other_file);
+	}
+	return $duplicates;
 }
 
 #
@@ -39,4 +74,11 @@ foreach my $desired_file (@desired_files)
 	import_desired_file($desired_file);
 }
 
-say Dumper(\%CN);
+#say Dumper(\%CN);
+say Dumper(\%DF);
+
+
+foreach my $check_desired_file (keys %DF) {
+	my $duplicate = is_redundant($check_desired_file);
+	say "\tfound $duplicate supersets for redundant file $check_desired_file" if $duplicate;
+}
